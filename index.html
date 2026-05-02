@@ -3,49 +3,62 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ResilliAI — Live Coach Portal</title>
+<title>ResilliAI — Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg:#060608; --surface:#0D0D10; --panel:#111115; --panel2:#16161B;
-  --border:#1E1E26; --border2:#2A2A36;
-  --text:#EEEEF0; --muted:#7070A0; --dim:#3A3A50;
-  --ce:#FF4F6D; --ca:#FFB020; --ar:#00E887; --ri:#4DB8FF;
-  --good:#00E887; --warn:#FFB020; --bad:#FF4F6D; --purple:#A855F7;
-  --font-d:'Syne',sans-serif; --font-m:'Space Mono',monospace;
-  --r:12px; --rs:7px;
+:root{
+  --bg:#060608;--surface:#0D0D10;--panel:#111115;--panel2:#16161B;
+  --border:#1E1E26;--border2:#2A2A36;--text:#EEEEF0;--muted:#7070A0;--dim:#3A3A50;
+  --ce:#FF4F6D;--ca:#FFB020;--ar:#00E887;--ri:#4DB8FF;
+  --good:#00E887;--warn:#FFB020;--bad:#FF4F6D;--purple:#A855F7;
+  --font-d:'Syne',sans-serif;--font-m:'Space Mono',monospace;
+  --r:12px;--rs:7px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-d);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;z-index:0;
-  background-image:linear-gradient(rgba(78,78,120,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(78,78,120,.025) 1px,transparent 1px);
-  background-size:40px 40px;pointer-events:none;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-d);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(78,78,120,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(78,78,120,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
 
-/* HEADER */
-header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:13px 22px;
-  background:rgba(6,6,8,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
+/* SETUP / LOGIN screen */
+.center-screen{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+.card-form{background:var(--panel);border:1px solid var(--border2);border-radius:14px;padding:28px;max-width:420px;width:100%;}
+.card-form h1{font-size:22px;font-weight:800;margin-bottom:6px;}
+.card-form h1 em{color:var(--ar);font-style:normal;}
+.card-form .sub{font-size:12px;color:var(--muted);margin-bottom:20px;font-family:var(--font-m);}
+.card-form label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:var(--font-m);}
+.card-form input{width:100%;padding:9px 11px;background:var(--bg);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-family:var(--font-m);font-size:13px;outline:none;margin-bottom:14px;}
+.card-form input:focus{border-color:var(--ar);}
+.card-form button{width:100%;padding:10px;background:var(--ar);color:#000;border:none;border-radius:7px;font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font-d);}
+.card-form button:hover{opacity:.9;}
+.card-form .alt{margin-top:12px;text-align:center;font-size:11px;color:var(--muted);}
+.card-form .alt a{color:var(--ar);cursor:pointer;text-decoration:underline;}
+.card-form .err{background:rgba(255,79,109,.08);border:1px solid rgba(255,79,109,.2);color:var(--bad);padding:8px 11px;border-radius:6px;font-family:var(--font-m);font-size:11px;margin-bottom:12px;}
+.card-form .ok{background:rgba(0,232,135,.08);border:1px solid rgba(0,232,135,.2);color:var(--good);padding:8px 11px;border-radius:6px;font-family:var(--font-m);font-size:11px;margin-bottom:12px;}
+.tabs{display:flex;gap:5px;margin-bottom:18px;}
+.tabs .tab{flex:1;padding:7px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--muted);font-family:var(--font-m);font-size:11px;cursor:pointer;text-align:center;}
+.tabs .tab.active{background:var(--ar);color:#000;border-color:var(--ar);font-weight:700;}
+
+/* APP layout */
+header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14px;padding:13px 22px;background:rgba(6,6,8,.93);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);}
 .logo{font-family:var(--font-d);font-weight:800;font-size:19px;letter-spacing:-.5px;}
 .logo em{color:var(--ar);font-style:normal;}
 .logo-sub{font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;font-family:var(--font-m);}
-.conn-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-family:var(--font-m);font-size:10px;transition:all .3s;}
+.conn-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-family:var(--font-m);font-size:10px;}
 .conn-badge.live{background:rgba(0,232,135,.1);color:var(--ar);border:1px solid rgba(0,232,135,.2);}
 .conn-badge.off{background:rgba(255,79,109,.07);color:var(--ce);border:1px solid rgba(255,79,109,.15);}
-.conn-dot{width:6px;height:6px;border-radius:50%;transition:all .3s;}
+.conn-dot{width:6px;height:6px;border-radius:50%;}
 .conn-badge.live .conn-dot{background:var(--ar);box-shadow:0 0 6px var(--ar);animation:pulse 2s infinite;}
 .conn-badge.off .conn-dot{background:var(--ce);}
 @keyframes pulse{0%,100%{box-shadow:0 0 4px var(--ar)}50%{box-shadow:0 0 14px var(--ar)}}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.p-chip{font-family:var(--font-m);font-size:10px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);padding:4px 10px;border-radius:20px;}
-.hdr-btn{background:var(--panel);border:1px solid var(--border2);color:var(--muted);font-family:var(--font-m);font-size:10px;padding:5px 12px;border-radius:var(--rs);cursor:pointer;transition:all .2s;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.role-chip{font-family:var(--font-m);font-size:10px;color:var(--muted);background:var(--panel);border:1px solid var(--border2);padding:4px 10px;border-radius:20px;}
+.hdr-btn{background:var(--panel);border:1px solid var(--border2);color:var(--muted);font-family:var(--font-m);font-size:10px;padding:5px 12px;border-radius:var(--rs);cursor:pointer;}
 .hdr-btn:hover{border-color:var(--ar);color:var(--ar);}
 
-/* THREE-COLUMN LAYOUT */
-.layout{position:relative;z-index:1;display:grid;grid-template-columns:290px 1fr 320px;height:calc(100vh - 54px);}
-
-/* shared */
+/* Student view */
+.student-layout{position:relative;z-index:1;display:grid;grid-template-columns:290px 1fr 320px;height:calc(100vh - 54px);}
 .col{display:flex;flex-direction:column;overflow:hidden;}
 .col:not(:last-child){border-right:1px solid var(--border);}
 .p-head{display:flex;align-items:center;gap:8px;padding:12px 16px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -55,536 +68,612 @@ header{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:14p
 .scrollable::-webkit-scrollbar{width:3px;}
 .scrollable::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
-/* DIMENSION CARDS */
 .dim-cards{display:flex;flex-direction:column;gap:8px;}
-.dim-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .3s,transform .25s;}
-.dim-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r) var(--r) 0 0;opacity:0;transition:opacity .4s;}
-.dim-CE::before{background:var(--ce);} .dim-CA::before{background:var(--ca);} .dim-AR::before{background:var(--ar);} .dim-RI::before{background:var(--ri);}
-.dim-card.active{transform:translateX(4px);border-color:var(--border2);}
-.dim-card.active.dim-CE{border-color:rgba(255,79,109,.3);}
-.dim-card.active.dim-CA{border-color:rgba(255,176,32,.3);}
-.dim-card.active.dim-AR{border-color:rgba(0,232,135,.3);}
-.dim-card.active.dim-RI{border-color:rgba(77,184,255,.3);}
-.dim-card.active::before{opacity:1;}
+.dim-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;position:relative;}
+.dim-CE{border-top:2px solid var(--ce);} .dim-CA{border-top:2px solid var(--ca);} .dim-AR{border-top:2px solid var(--ar);} .dim-RI{border-top:2px solid var(--ri);}
 .dim-lbl{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
 .dim-CE .dim-lbl{color:var(--ce);} .dim-CA .dim-lbl{color:var(--ca);} .dim-AR .dim-lbl{color:var(--ar);} .dim-RI .dim-lbl{color:var(--ri);}
 .dim-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;}
-.dim-score-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px;}
 .dim-score{font-family:var(--font-m);font-size:26px;font-weight:700;}
 .dim-CE .dim-score{color:var(--ce);} .dim-CA .dim-score{color:var(--ca);} .dim-AR .dim-score{color:var(--ar);} .dim-RI .dim-score{color:var(--ri);}
 .dim-of{font-family:var(--font-m);font-size:11px;color:var(--dim);}
-.dim-track{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
-.dim-fill{height:100%;border-radius:2px;transition:width .9s cubic-bezier(.4,0,.2,1);}
+.dim-track{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;margin-top:9px;}
+.dim-fill{height:100%;border-radius:2px;transition:width .8s;}
 .dim-CE .dim-fill{background:var(--ce);} .dim-CA .dim-fill{background:var(--ca);} .dim-AR .dim-fill{background:var(--ar);} .dim-RI .dim-fill{background:var(--ri);}
-.dim-delta{font-family:var(--font-m);font-size:10px;position:absolute;top:12px;right:14px;opacity:0;transform:translateY(-5px);transition:opacity .3s,transform .3s;}
-.dim-delta.show{opacity:1;transform:translateY(0);}
-.dim-delta.pos{color:var(--good);} .dim-delta.neg{color:var(--bad);}
 
-/* STATS BAR */
 .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border);flex-shrink:0;}
-.sb{padding:13px 16px;border-right:1px solid var(--border);transition:background .25s;}
+.sb{padding:13px 16px;border-right:1px solid var(--border);}
 .sb:last-child{border-right:none;}
-.sb.flash{background:rgba(0,232,135,.05);}
-.sb-val{font-family:var(--font-m);font-size:20px;font-weight:700;line-height:1;margin-bottom:5px;transition:color .3s;}
+.sb-val{font-family:var(--font-m);font-size:20px;font-weight:700;line-height:1;margin-bottom:5px;}
 .sb-lbl{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);}
 
-/* FEED */
 .feed-area{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
-.feed-area::-webkit-scrollbar{width:3px;}
-.feed-area::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-.feed-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--dim);text-align:center;padding:30px 20px;}
+.feed-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--dim);text-align:center;padding:30px;}
 .feed-empty .ei{font-size:36px;opacity:.25;}
 .feed-empty p{font-family:var(--font-m);font-size:10px;line-height:1.7;color:var(--muted);}
 
-/* PROMPT CARD */
-.pc{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:slideIn .3s cubic-bezier(.4,0,.2,1);}
+.pc{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;animation:slideIn .3s;}
 @keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .pc.newest{border-color:rgba(0,232,135,.3);box-shadow:0 0 24px rgba(0,232,135,.05);}
 .pc-head{display:flex;align-items:center;gap:7px;padding:9px 13px 8px;border-bottom:1px solid var(--border);background:var(--panel2);}
 .pc-n{font-family:var(--font-m);font-size:10px;color:var(--dim);}
-.state-badge{padding:2px 9px;border-radius:20px;font-family:var(--font-m);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.s-reflective{background:rgba(0,232,135,.12);color:var(--ar);}
-.s-collaborative{background:rgba(77,184,255,.12);color:var(--ri);}
-.s-cautious{background:rgba(255,176,32,.12);color:var(--ca);}
-.s-thoughtless{background:rgba(255,79,109,.12);color:var(--ce);}
-.delta-badge{padding:2px 9px;border-radius:20px;font-family:var(--font-m);font-size:9px;font-weight:700;}
-.d-pos{background:rgba(0,232,135,.12);color:var(--good);}
-.d-neu{background:rgba(255,176,32,.12);color:var(--warn);}
-.d-neg{background:rgba(255,79,109,.12);color:var(--bad);}
+.state-badge,.delta-badge{padding:2px 9px;border-radius:20px;font-family:var(--font-m);font-size:9px;font-weight:700;text-transform:uppercase;}
+.s-reflective{background:rgba(0,232,135,.12);color:var(--ar);} .s-collaborative{background:rgba(77,184,255,.12);color:var(--ri);} .s-cautious{background:rgba(255,176,32,.12);color:var(--ca);} .s-thoughtless{background:rgba(255,79,109,.12);color:var(--ce);}
+.d-pos{background:rgba(0,232,135,.12);color:var(--good);} .d-neu{background:rgba(255,176,32,.12);color:var(--warn);} .d-neg{background:rgba(255,79,109,.12);color:var(--bad);}
 .pc-xp{margin-left:auto;font-family:var(--font-m);font-size:10px;color:var(--muted);}
 .pc-time{font-family:var(--font-m);font-size:9px;color:var(--dim);}
 .pc-body{padding:12px 14px;}
 .pc-prompt{font-size:13px;line-height:1.6;color:var(--text);margin-bottom:10px;}
-
-/* dim impacts row */
 .dim-impacts{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px;}
-.di{display:inline-flex;align-items:center;gap:3px;font-family:var(--font-m);font-size:9px;padding:2px 7px;border-radius:20px;}
-.di-p{background:rgba(0,232,135,.1);color:var(--good);}
-.di-n{background:rgba(255,79,109,.1);color:var(--bad);}
-.di-z{background:rgba(70,70,100,.18);color:var(--muted);}
-
-/* analysis block */
+.di{font-family:var(--font-m);font-size:9px;padding:2px 7px;border-radius:20px;}
+.di-p{background:rgba(0,232,135,.1);color:var(--good);} .di-n{background:rgba(255,79,109,.1);color:var(--bad);} .di-z{background:rgba(70,70,100,.18);color:var(--muted);}
 .analysis{background:var(--panel2);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;margin-bottom:9px;}
-.a-title{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:7px;}
-.a-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;}
+.a-row{display:flex;gap:8px;margin-bottom:5px;}
 .a-row:last-child{margin-bottom:0;}
-.a-icon{font-size:12px;flex-shrink:0;line-height:1.4;}
 .a-text{font-size:11px;line-height:1.5;}
-.a-good{color:var(--good);} .a-warn{color:var(--warn);} .a-info{color:var(--ri);}
-
-/* signal chips */
-.sig-chips{display:flex;gap:5px;flex-wrap:wrap;}
-.sc{font-family:var(--font-m);font-size:9px;padding:2px 7px;border-radius:20px;border:1px solid;}
-.sc-g{color:var(--good);border-color:rgba(0,232,135,.25);background:rgba(0,232,135,.06);}
-.sc-b{color:var(--bad);border-color:rgba(255,79,109,.25);background:rgba(255,79,109,.06);}
-.sc-n{color:var(--muted);border-color:var(--border);background:var(--panel2);}
-
-/* response */
+.a-good{color:var(--good);} .a-warn{color:var(--warn);}
 .resp-area{border-top:1px solid var(--border);padding:10px 14px;}
 .resp-lbl{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
 .stream-dot{width:5px;height:5px;border-radius:50%;background:var(--warn);animation:blink .8s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.resp-text{font-size:11px;line-height:1.6;color:#9090B8;max-height:90px;overflow:hidden;position:relative;}
-.resp-text::after{content:'';position:absolute;bottom:0;left:0;right:0;height:28px;background:linear-gradient(transparent,var(--panel));}
-.resp-text.done{color:#B0B0C8;}
+.resp-text{font-size:11px;line-height:1.6;color:#9090B8;max-height:90px;overflow:hidden;}
 
-/* RIGHT SIDEBAR */
 .chart-sec{padding:13px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .chart-sec h4{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:9px;}
 .chart-wrap{position:relative;height:120px;}
-.rec{background:linear-gradient(135deg,rgba(168,85,247,.07),rgba(77,184,255,.07));border:1px solid rgba(168,85,247,.2);border-radius:var(--rs);padding:12px 14px;margin:0 14px 12px;flex-shrink:0;display:none;animation:slideIn .3s;}
-.rec.vis{display:block;}
-.rec-lbl{font-family:var(--font-m);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--purple);margin-bottom:6px;}
-.rec-body{font-size:12px;line-height:1.6;color:var(--text);margin-bottom:8px;}
-.rec-tips{display:flex;gap:5px;flex-wrap:wrap;}
-.rec-tip{font-family:var(--font-m);font-size:10px;background:var(--panel);border:1px solid var(--border2);color:#A0A0C0;padding:3px 9px;border-radius:var(--rs);}
-.ex-scroll{flex:1;overflow-y:auto;padding:14px;}
-.ex-scroll::-webkit-scrollbar{width:3px;}
-.ex-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
-.ex-empty{font-family:var(--font-m);font-size:10px;color:var(--dim);text-align:center;padding:20px;}
-.ex-item{background:var(--panel);border:1px solid var(--border);border-radius:var(--rs);padding:9px 11px;margin-bottom:7px;animation:slideIn .3s;}
-.ex-head{display:flex;align-items:center;gap:7px;margin-bottom:5px;}
-.ex-tag{font-family:var(--font-m);font-size:8px;font-weight:700;padding:2px 6px;border-radius:20px;}
-.ex-CE{background:rgba(255,79,109,.15);color:var(--ce);} .ex-CA{background:rgba(255,176,32,.15);color:var(--ca);}
-.ex-AR{background:rgba(0,232,135,.15);color:var(--ar);} .ex-RI{background:rgba(77,184,255,.15);color:var(--ri);}
-.ex-type{font-size:11px;font-weight:600;color:var(--text);}
-.ex-resp{font-size:10px;color:var(--muted);line-height:1.4;margin-top:3px;}
-.ex-skip{font-size:10px;color:var(--dim);font-style:italic;}
 
-/* XP TOAST */
-.xp-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--panel);border:1px solid var(--ar);border-radius:30px;padding:9px 22px;font-family:var(--font-m);font-size:13px;font-weight:700;color:var(--ar);z-index:999;transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s;opacity:0;pointer-events:none;box-shadow:0 4px 28px rgba(0,232,135,.15);}
-.xp-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+/* Instructor view */
+.inst-layout{position:relative;z-index:1;display:grid;grid-template-columns:300px 1fr;height:calc(100vh - 54px);}
+.student-list{overflow-y:auto;border-right:1px solid var(--border);}
+.student-row{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;}
+.student-row:hover{background:var(--panel);}
+.student-row.active{background:var(--panel);border-left:2px solid var(--ar);}
+.student-name{font-size:13px;font-weight:600;}
+.student-meta{font-size:10px;color:var(--muted);font-family:var(--font-m);margin-top:3px;}
+.student-stats{display:flex;gap:10px;margin-top:5px;}
+.student-stat{font-family:var(--font-m);font-size:9px;color:var(--dim);}
+.student-stat b{color:var(--text);}
+.no-student{flex:1;display:flex;align-items:center;justify-content:center;color:var(--dim);font-family:var(--font-m);font-size:12px;}
 
-/* RESPONSIVE */
+/* responsive */
 @media(max-width:1060px){
-  .layout{grid-template-columns:260px 1fr 280px;}
+  .student-layout{grid-template-columns:260px 1fr 280px;}
 }
 @media(max-width:820px){
-  .layout{grid-template-columns:1fr;height:auto;}
-  .col:not(:last-child){border-right:none;border-bottom:1px solid var(--border);}
-  .dim-cards{display:grid;grid-template-columns:1fr 1fr;}
-  .feed-area{max-height:580px;}
+  .student-layout,.inst-layout{grid-template-columns:1fr;height:auto;}
+  .col:not(:last-child),.student-list{border-right:none;border-bottom:1px solid var(--border);}
   .stats-bar{grid-template-columns:1fr 1fr;}
-  .sb:nth-child(2){border-right:none;}
-  .sb:nth-child(3){border-top:1px solid var(--border);}
-  .sb:last-child{border-right:none;border-top:1px solid var(--border);}
-}
-@media(max-width:480px){
-  header{flex-wrap:wrap;gap:8px;padding:10px 14px;}
-  .hdr-right{width:100%;justify-content:flex-end;}
-  .dim-cards{grid-template-columns:1fr;}
-  .logo-sub{display:none;}
 }
 </style>
 </head>
 <body>
 
-<div class="xp-toast" id="xp-toast">+0 XP</div>
-
-<header>
-  <div class="logo">Resilli<em>AI</em><span class="logo-sub">LIVE PORTAL</span></div>
-  <div class="conn-badge off" id="conn-badge">
-    <div class="conn-dot"></div>
-    <span id="conn-txt">Waiting for extension…</span>
-  </div>
-  <div class="hdr-right">
-    <div class="p-chip" id="p-chip">No participant</div>
-    <button class="hdr-btn" onclick="exportCSV()">Export CSV</button>
-    <button class="hdr-btn" onclick="requestSnapshot()">Refresh</button>
-  </div>
-</header>
-
-<div class="layout">
-
-  <!-- LEFT — profile -->
-  <div class="col">
-    <div class="p-head">
-      <span class="p-title">CR Profile</span>
-      <span class="p-badge" id="state-lbl">—</span>
-    </div>
-    <div class="scrollable">
-      <div class="dim-cards" id="dim-cards"></div>
-    </div>
-  </div>
-
-  <!-- CENTER — feed -->
-  <div class="col">
-    <div class="stats-bar">
-      <div class="sb" id="sb-p"><div class="sb-val" id="sv-p">0</div><div class="sb-lbl">Prompts</div></div>
-      <div class="sb" id="sb-x"><div class="sb-val" id="sv-x">0</div><div class="sb-lbl">Total XP</div></div>
-      <div class="sb" id="sb-a"><div class="sb-val" id="sv-a">—</div><div class="sb-lbl">Avg Score</div></div>
-      <div class="sb" id="sb-s"><div class="sb-val" id="sv-s" style="font-size:13px;">—</div><div class="sb-lbl">State</div></div>
-    </div>
-    <div class="p-head">
-      <span class="p-title">Live Prompt Feed</span>
-      <span class="p-badge" id="feed-n">0</span>
-    </div>
-    <div class="feed-area" id="feed">
-      <div class="feed-empty">
-        <div class="ei">◎</div>
-        <p>Open ChatGPT or Claude in another tab.<br>Every prompt appears here instantly.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT — charts + exercises -->
-  <div class="col">
-    <div class="chart-sec">
-      <h4>Dimension Trajectory</h4>
-      <div class="chart-wrap"><canvas id="ct"></canvas></div>
-    </div>
-    <div class="chart-sec">
-      <h4>Behavioral Signals (last 15)</h4>
-      <div class="chart-wrap"><canvas id="cs"></canvas></div>
-    </div>
-    <div class="rec" id="rec">
-      <div class="rec-lbl">Recommended Focus</div>
-      <div class="rec-body" id="rec-body"></div>
-      <div class="rec-tips" id="rec-tips"></div>
-    </div>
-    <div class="p-head" style="flex-shrink:0;">
-      <span class="p-title">Exercises</span>
-      <span class="p-badge" id="ex-n">0</span>
-    </div>
-    <div class="ex-scroll" id="ex-list">
-      <div class="ex-empty">No exercises yet.</div>
-    </div>
+<!-- ============ SETUP / LOGIN ============ -->
+<div id="screen-setup" class="center-screen">
+  <div class="card-form">
+    <h1>Resilli<em>AI</em> Dashboard</h1>
+    <div class="sub">Connect to your Supabase backend</div>
+    <div id="cfgmsg"></div>
+    <label>Supabase URL</label>
+    <input id="cfg-url" placeholder="https://xxxx.supabase.co"/>
+    <label>Anon public key</label>
+    <input id="cfg-key" placeholder="eyJh…"/>
+    <button id="cfg-save">Connect</button>
+    <div class="alt">Find these at <em>Settings → API</em> in your Supabase dashboard.</div>
   </div>
 </div>
 
-<script src="listener.js"></script>
+<div id="screen-auth" class="center-screen" style="display:none;">
+  <div class="card-form">
+    <h1>Sign in</h1>
+    <div class="sub">Use your participant account</div>
+    <div class="tabs">
+      <div class="tab active" data-auth-tab="signin">Sign in</div>
+      <div class="tab" data-auth-tab="signup">Sign up</div>
+    </div>
+    <div id="authmsg"></div>
+    <label>Email</label>
+    <input id="auth-email" type="email" placeholder="you@example.com"/>
+    <label>Password</label>
+    <input id="auth-pass" type="password" placeholder="6+ characters"/>
+    <button id="auth-submit">Sign in</button>
+    <div class="alt"><a id="reset-cfg">Reconnect to a different Supabase project</a></div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="screen-app" style="display:none;">
+  <header>
+    <div class="logo">Resilli<em>AI</em><span class="logo-sub" id="hdr-sub">DASHBOARD v7.2</span></div>
+    <div class="conn-badge live" id="conn-badge"><div class="conn-dot"></div><span id="conn-txt">Realtime connected</span></div>
+    <div class="hdr-right">
+      <div class="role-chip" id="role-chip">student</div>
+      <button class="hdr-btn" id="export-btn">Export CSV</button>
+      <button class="hdr-btn" id="signout-btn">Sign out</button>
+    </div>
+  </header>
+
+  <!-- Student view -->
+  <div id="student-view" class="student-layout">
+    <div class="col">
+      <div class="p-head"><span class="p-title">CR Profile</span><span class="p-badge" id="st-state">—</span></div>
+      <div class="scrollable"><div class="dim-cards" id="dim-cards"></div></div>
+    </div>
+    <div class="col">
+      <div class="stats-bar">
+        <div class="sb"><div class="sb-val" id="sv-p">0</div><div class="sb-lbl">Prompts</div></div>
+        <div class="sb"><div class="sb-val" id="sv-x">0</div><div class="sb-lbl">XP</div></div>
+        <div class="sb"><div class="sb-val" id="sv-a">2.00</div><div class="sb-lbl">Avg</div></div>
+        <div class="sb"><div class="sb-val" id="sv-s" style="font-size:13px;">—</div><div class="sb-lbl">State</div></div>
+      </div>
+      <div class="p-head"><span class="p-title">Live Prompt Feed</span><span class="p-badge" id="feed-n">0</span></div>
+      <div class="feed-area" id="feed">
+        <div class="feed-empty"><div class="ei">◎</div><p>Open ChatGPT, Claude, Gemini, or any AI in another tab.<br>Prompts appear here in realtime.</p></div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="chart-sec">
+        <h4>Dimension Trajectory</h4>
+        <div class="chart-wrap"><canvas id="ct"></canvas></div>
+      </div>
+      <div class="chart-sec">
+        <h4>Behavioral Signals (last 15)</h4>
+        <div class="chart-wrap"><canvas id="cs"></canvas></div>
+      </div>
+      <div class="p-head"><span class="p-title">Exercises</span><span class="p-badge" id="ex-n">0</span></div>
+      <div class="scrollable" id="ex-list"><div style="font-family:var(--font-m);font-size:10px;color:var(--dim);text-align:center;padding:20px;">No exercises yet.</div></div>
+    </div>
+  </div>
+
+  <!-- Instructor view -->
+  <div id="inst-view" class="inst-layout" style="display:none;">
+    <div class="student-list" id="student-list">
+      <div class="p-head" style="position:sticky;top:0;background:var(--bg);z-index:1;">
+        <span class="p-title">Students</span>
+        <span class="p-badge" id="st-count">0</span>
+      </div>
+      <div id="student-rows"></div>
+    </div>
+    <div id="student-detail" class="no-student">Select a student from the list</div>
+  </div>
+</div>
+
 <script>
-const DIMS=['Critical Evaluation','Cognitive Autonomy','Adaptive Regulation','Reflective Integration'];
-const KEYS=['CE','CA','AR','RI'];
-const COL={CE:'#FF4F6D',CA:'#FFB020',AR:'#00E887',RI:'#4DB8FF'};
-const SHORT={CE:'Crit Eval',CA:'Cog Auto',AR:'Adapt Reg',RI:'Refl Int'};
+// =====================================================================
+// CONFIG / AUTH
+// =====================================================================
+let client = null;
+let user = null;
+let role = 'student';
+let activeStudentId = null;
 
-const st={
-  profile:{'Critical Evaluation':2,'Cognitive Autonomy':2,'Adaptive Regulation':2,'Reflective Integration':2},
-  totalXP:0, sessionLogs:[], exerciseLogs:[], surveyLogs:[],
-  participant:null, liveEntries:new Map(), liveOrder:[], promptCount:0
-};
+const CFG_KEY = 'resiliai-dashboard-cfg';
 
-/* ---- Charts ---- */
-let traj, sigs;
-function initCharts(){
-  const base={responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#555',font:{size:9,family:'Space Mono'},boxWidth:8}}}};
-  traj=new Chart(document.getElementById('ct').getContext('2d'),{type:'line',
-    data:{labels:[],datasets:KEYS.map(k=>({label:SHORT[k],data:[],borderColor:COL[k],backgroundColor:COL[k]+'18',borderWidth:1.5,tension:.35,pointRadius:0,fill:false}))},
-    options:{...base,scales:{y:{min:0,max:4,ticks:{color:'#444',font:{size:8,family:'Space Mono'},stepSize:1},grid:{color:'#1A1A22'}},x:{ticks:{color:'#333',font:{size:8,family:'Space Mono'},maxTicksLimit:6},grid:{display:false}}}}});
-  sigs=new Chart(document.getElementById('cs').getContext('2d'),{type:'bar',
-    data:{labels:[],datasets:[
-      {label:'Paste%',data:[],backgroundColor:'#FF4F6D55',borderColor:'#FF4F6D',borderWidth:1},
-      {label:'Revisions',data:[],backgroundColor:'#4DB8FF55',borderColor:'#4DB8FF',borderWidth:1},
-      {label:'Words/10',data:[],backgroundColor:'#00E88755',borderColor:'#00E887',borderWidth:1}]},
-    options:{...base,scales:{y:{ticks:{color:'#444',font:{size:8,family:'Space Mono'}},grid:{color:'#1A1A22'}},x:{ticks:{color:'#333',font:{size:8,family:'Space Mono'},maxTicksLimit:8},grid:{display:false}}}}});
+function $(id) { return document.getElementById(id); }
+function show(id) { ['screen-setup','screen-auth','screen-app'].forEach(s => $(s).style.display = s===id ? '' : 'none'); }
+function showCfgMsg(html, err) { $('cfgmsg').innerHTML = html ? `<div class="${err?'err':'ok'}">${html}</div>` : ''; }
+function showAuthMsg(html, err) { $('authmsg').innerHTML = html ? `<div class="${err?'err':'ok'}">${html}</div>` : ''; }
+
+function loadCfg() {
+  try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch (e) { return null; }
 }
-initCharts();
+function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
 
-/* ---- Dim cards ---- */
-function renderDims(deltas){
-  const c=document.getElementById('dim-cards');
-  KEYS.forEach((k,i)=>{
-    const name=DIMS[i], v=+(st.profile[name]??2);
-    let card=document.getElementById('dc-'+k);
-    if(!card){
-      card=document.createElement('div');
-      card.className=`dim-card dim-${k}`;card.id='dc-'+k;
-      card.innerHTML=`<div class="dim-lbl">${k}</div><div class="dim-name">${name}</div>
-        <div class="dim-score-row"><span class="dim-score" id="dv-${k}">2.00</span><span class="dim-of">/4</span></div>
-        <div class="dim-track"><div class="dim-fill" id="df-${k}" style="width:50%"></div></div>
-        <div class="dim-delta" id="dd-${k}"></div>`;
-      c.appendChild(card);
-    }
-    document.getElementById('dv-'+k).textContent=v.toFixed(2);
-    document.getElementById('df-'+k).style.width=Math.round(v/4*100)+'%';
-    if(deltas&&k in deltas){
-      const d=deltas[k],el=document.getElementById('dd-'+k);
-      el.textContent=(d>=0?'+':'')+d.toFixed(2);
-      el.className='dim-delta show '+(d>0?'pos':'neg');
-      card.classList.add('active');
-      setTimeout(()=>{el.classList.remove('show');card.classList.remove('active');},3200);
-    }
+async function bootstrap() {
+  const cfg = loadCfg();
+  if (!cfg || !cfg.url || !cfg.anonKey) { show('screen-setup'); return; }
+  await connectClient(cfg);
+}
+
+async function connectClient(cfg) {
+  try {
+    client = window.supabase.createClient(cfg.url, cfg.anonKey, { auth:{ persistSession:true, autoRefreshToken:true } });
+    const { data } = await client.auth.getSession();
+    user = data?.session?.user || null;
+    if (user) await afterSignIn();
+    else show('screen-auth');
+  } catch (e) {
+    showCfgMsg('Connection failed: ' + e.message, true);
+    show('screen-setup');
+  }
+}
+
+async function afterSignIn() {
+  // Fetch profile to get role
+  const { data: prof } = await client.from('profiles').select('role,display_name,participant_id,condition,phase').eq('id', user.id).single();
+  role = prof?.role || 'student';
+  $('role-chip').textContent = role;
+  show('screen-app');
+  if (role === 'student') {
+    $('hdr-sub').textContent = 'STUDENT VIEW';
+    $('student-view').style.display = '';
+    $('inst-view').style.display = 'none';
+    initStudentView(user.id);
+  } else {
+    $('hdr-sub').textContent = 'INSTRUCTOR VIEW';
+    $('student-view').style.display = 'none';
+    $('inst-view').style.display = '';
+    initInstructorView();
+  }
+}
+
+$('cfg-save').addEventListener('click', async () => {
+  const url = $('cfg-url').value.trim();
+  const anonKey = $('cfg-key').value.trim();
+  if (!url || !anonKey) { showCfgMsg('Both fields required', true); return; }
+  saveCfg({ url, anonKey });
+  showCfgMsg('Saved. Connecting…');
+  await connectClient({ url, anonKey });
+});
+
+$('reset-cfg').addEventListener('click', () => { localStorage.removeItem(CFG_KEY); show('screen-setup'); });
+
+let activeAuthTab = 'signin';
+document.querySelectorAll('[data-auth-tab]').forEach(t => {
+  t.addEventListener('click', () => {
+    activeAuthTab = t.dataset.authTab;
+    document.querySelectorAll('[data-auth-tab]').forEach(x => x.classList.toggle('active', x === t));
+    $('auth-submit').textContent = activeAuthTab === 'signin' ? 'Sign in' : 'Create account';
   });
-  const last=st.sessionLogs[st.sessionLogs.length-1];
-  document.getElementById('state-lbl').textContent=last?.state||'—';
+});
+
+$('auth-submit').addEventListener('click', async () => {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  if (!email || !pass) { showAuthMsg('Email and password required', true); return; }
+  showAuthMsg('Working…');
+  if (activeAuthTab === 'signin') {
+    const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
+    if (error) { showAuthMsg(error.message, true); return; }
+    user = data.user; await afterSignIn();
+  } else {
+    const { data, error } = await client.auth.signUp({ email, password: pass });
+    if (error) { showAuthMsg(error.message, true); return; }
+    showAuthMsg('Account created. Check email for verification, then sign in.');
+  }
+});
+
+$('signout-btn').addEventListener('click', async () => {
+  await client.auth.signOut();
+  user = null; activeStudentId = null;
+  show('screen-auth');
+});
+
+// =====================================================================
+// STUDENT VIEW
+// =====================================================================
+const DIMS = ['Critical Evaluation','Cognitive Autonomy','Adaptive Regulation','Reflective Integration'];
+const KEYS = ['CE','CA','AR','RI'];
+const COL = { CE:'#FF4F6D', CA:'#FFB020', AR:'#00E887', RI:'#4DB8FF' };
+const SHORT = { CE:'Crit', CA:'Cog', AR:'Adapt', RI:'Refl' };
+
+let studentState = {
+  profile: { 'Critical Evaluation':2,'Cognitive Autonomy':2,'Adaptive Regulation':2,'Reflective Integration':2 },
+  totalXP: 0, promptCount: 0,
+  prompts: [], exercises: [], state: '—'
+};
+let trajChart, sigChart, channels = [];
+
+function initCharts() {
+  const base = { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color:'#555', font:{size:9,family:'Space Mono'}, boxWidth:8 } } } };
+  trajChart = new Chart($('ct').getContext('2d'), {
+    type: 'line',
+    data: { labels: [], datasets: KEYS.map(k => ({
+      label: SHORT[k], data: [], borderColor: COL[k], backgroundColor: COL[k]+'18',
+      borderWidth: 1.5, tension: .35, pointRadius: 0, fill: false
+    })) },
+    options: { ...base, scales: {
+      y: { min:0, max:4, ticks:{color:'#444', font:{size:8,family:'Space Mono'}, stepSize:1}, grid:{color:'#1A1A22'} },
+      x: { ticks:{color:'#333', font:{size:8,family:'Space Mono'}, maxTicksLimit:6}, grid:{display:false} }
+    }}
+  });
+  sigChart = new Chart($('cs').getContext('2d'), {
+    type: 'bar',
+    data: { labels: [], datasets: [
+      { label:'Paste%', data:[], backgroundColor:'#FF4F6D55', borderColor:'#FF4F6D', borderWidth:1 },
+      { label:'Revisions', data:[], backgroundColor:'#4DB8FF55', borderColor:'#4DB8FF', borderWidth:1 },
+      { label:'Words/10', data:[], backgroundColor:'#00E88755', borderColor:'#00E887', borderWidth:1 }
+    ]},
+    options: { ...base, scales: {
+      y: { ticks:{color:'#444', font:{size:8,family:'Space Mono'}}, grid:{color:'#1A1A22'} },
+      x: { ticks:{color:'#333', font:{size:8,family:'Space Mono'}, maxTicksLimit:8}, grid:{display:false} }
+    }}
+  });
 }
 
-/* ---- Stats bar ---- */
-function renderStats(){
-  const dims=Object.values(st.profile);
-  const avg=dims.length?dims.reduce((a,b)=>a+b,0)/dims.length:0;
-  document.getElementById('sv-p').textContent=st.promptCount;
-  document.getElementById('sv-x').textContent=st.totalXP;
-  document.getElementById('sv-a').textContent=avg.toFixed(2);
-  const last=st.sessionLogs[st.sessionLogs.length-1];
-  const s=last?.state||'—';
-  document.getElementById('sv-s').textContent=s.charAt(0).toUpperCase()+s.slice(1);
-  ['sb-p','sb-x'].forEach(id=>{const el=document.getElementById(id);el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),600);});
+async function initStudentView(userId) {
+  if (!trajChart) initCharts();
+  await loadStudentData(userId);
+  subscribeStudent(userId);
 }
 
-/* ---- Feed ---- */
-function renderFeed(){
-  const feed=document.getElementById('feed');
-  document.getElementById('feed-n').textContent=st.liveOrder.length;
-  if(!st.liveOrder.length){
-    feed.innerHTML=`<div class="feed-empty"><div class="ei">◎</div><p>Open ChatGPT or Claude in another tab.<br>Every prompt appears here instantly.</p></div>`;
+async function loadStudentData(userId) {
+  const [{ data: prof }, { data: prompts }, { data: ex }] = await Promise.all([
+    client.from('cr_profiles').select('*').eq('user_id', userId).single(),
+    client.from('prompts').select('*').eq('user_id', userId).order('created_at', { ascending: true }).limit(200),
+    client.from('exercises').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20)
+  ]);
+  if (prof) {
+    studentState.profile = {
+      'Critical Evaluation': prof.critical_evaluation,
+      'Cognitive Autonomy': prof.cognitive_autonomy,
+      'Adaptive Regulation': prof.adaptive_regulation,
+      'Reflective Integration': prof.reflective_integration
+    };
+    studentState.totalXP = prof.total_xp || 0;
+    studentState.promptCount = prof.prompt_count || 0;
+    studentState.state = prof.current_state || '—';
+  }
+  studentState.prompts = prompts || [];
+  studentState.exercises = ex || [];
+  rerenderStudent();
+}
+
+function subscribeStudent(userId) {
+  channels.forEach(c => client.removeChannel(c));
+  channels = [];
+
+  const ch1 = client.channel('s_prompts_' + userId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'prompts', filter: `user_id=eq.${userId}` },
+      (payload) => { studentState.prompts.push(payload.new); rerenderStudent(true); })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'prompts', filter: `user_id=eq.${userId}` },
+      (payload) => {
+        const i = studentState.prompts.findIndex(p => p.id === payload.new.id);
+        if (i !== -1) studentState.prompts[i] = payload.new;
+        rerenderStudent();
+      })
+    .subscribe();
+
+  const ch2 = client.channel('s_profile_' + userId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'cr_profiles', filter: `user_id=eq.${userId}` },
+      (payload) => {
+        const p = payload.new;
+        studentState.profile = {
+          'Critical Evaluation': p.critical_evaluation,
+          'Cognitive Autonomy': p.cognitive_autonomy,
+          'Adaptive Regulation': p.adaptive_regulation,
+          'Reflective Integration': p.reflective_integration
+        };
+        studentState.totalXP = p.total_xp;
+        studentState.promptCount = p.prompt_count;
+        studentState.state = p.current_state;
+        rerenderStudent();
+      })
+    .subscribe();
+
+  const ch3 = client.channel('s_ex_' + userId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'exercises', filter: `user_id=eq.${userId}` },
+      (payload) => { studentState.exercises.unshift(payload.new); renderExercises(); })
+    .subscribe();
+
+  channels.push(ch1, ch2, ch3);
+}
+
+function renderDims() {
+  const c = $('dim-cards'); c.innerHTML = '';
+  KEYS.forEach((k, i) => {
+    const name = DIMS[i];
+    const v = +(studentState.profile[name] ?? 2);
+    const card = document.createElement('div');
+    card.className = `dim-card dim-${k}`;
+    card.innerHTML = `
+      <div class="dim-lbl">${k}</div>
+      <div class="dim-name">${name}</div>
+      <span class="dim-score">${v.toFixed(2)}</span><span class="dim-of">/4</span>
+      <div class="dim-track"><div class="dim-fill" style="width:${Math.round(v/4*100)}%"></div></div>`;
+    c.appendChild(card);
+  });
+  $('st-state').textContent = studentState.state || '—';
+}
+
+function renderStats() {
+  const dims = Object.values(studentState.profile);
+  const avg = dims.reduce((a,b)=>a+b,0)/dims.length;
+  $('sv-p').textContent = studentState.promptCount;
+  $('sv-x').textContent = studentState.totalXP;
+  $('sv-a').textContent = avg.toFixed(2);
+  $('sv-s').textContent = studentState.state ? studentState.state.charAt(0).toUpperCase() + studentState.state.slice(1) : '—';
+}
+
+function renderFeed(scrollTop) {
+  const feed = $('feed');
+  const prompts = studentState.prompts.slice().reverse().slice(0, 30);
+  $('feed-n').textContent = studentState.prompts.length;
+  if (!prompts.length) {
+    feed.innerHTML = `<div class="feed-empty"><div class="ei">◎</div><p>Open ChatGPT, Claude, Gemini, or any AI in another tab.<br>Prompts appear here in realtime.</p></div>`;
     return;
   }
-  feed.innerHTML='';
-  [...st.liveOrder].reverse().slice(0,20).forEach((id,i)=>{
-    const e=st.liveEntries.get(id);if(!e)return;
-    feed.appendChild(buildCard(e,i===0));
-  });
+  feed.innerHTML = '';
+  prompts.forEach((p, i) => feed.appendChild(buildCard(p, i === 0)));
+  if (scrollTop) feed.scrollTop = 0;
 }
 
-function buildCard(e,isNew){
-  const d=e.deltaSummary??0;
-  const dc=d>=0.4?'d-pos':d>=-0.1?'d-neu':'d-neg';
-  const sc='s-'+(e.state||'cautious');
-  const sl=(e.state||'cautious');
-  const stLbl=sl.charAt(0).toUpperCase()+sl.slice(1);
-
-  const card=document.createElement('div');
-  card.className='pc'+(isNew?' newest':'');
-  card.dataset.id=e.id;
-  if(isNew)card.dataset.newest='1';
-
-  const analysis=buildAnalysis(e);
-  const impacts=buildImpacts(e.deltas||{});
-  const chips=buildChips(e);
-  const resp=e.response!==undefined?buildResp(e):'';
-
-  card.innerHTML=`
+function buildCard(p, isNew) {
+  const d = +(p.delta_summary ?? 0);
+  const dc = d >= 0.4 ? 'd-pos' : d >= -0.1 ? 'd-neu' : 'd-neg';
+  const sl = p.state || 'cautious';
+  const stLbl = sl.charAt(0).toUpperCase() + sl.slice(1);
+  const card = document.createElement('div');
+  card.className = 'pc' + (isNew ? ' newest' : '');
+  const features = p.features || {};
+  const signals = p.signals || {};
+  const deltas = p.deltas || {};
+  const impacts = KEYS.map(k => {
+    const v = deltas[k] ?? 0;
+    const cls = v > 0.05 ? 'di-p' : v < -0.05 ? 'di-n' : 'di-z';
+    const arrow = v > 0.05 ? '↑' : v < -0.05 ? '↓' : '→';
+    return `<span class="di ${cls}">${SHORT[k]} ${arrow}${Math.abs(v).toFixed(2)}</span>`;
+  }).join('');
+  const analysis = buildAnalysis(features, signals);
+  const respText = (p.response_text || '').slice(0, 300) + ((p.response_text || '').length > 300 ? '…' : '');
+  const streaming = p.response_text && !p.response_duration_ms;
+  const respHtml = p.response_text || streaming ? `
+    <div class="resp-area">
+      <div class="resp-lbl">${streaming ? '<span class="stream-dot"></span>STREAMING' : 'AI RESPONSE'}</div>
+      <div class="resp-text">${esc(respText)}</div>
+    </div>` : '';
+  card.innerHTML = `
     <div class="pc-head">
-      <span class="pc-n">#${e.msgNumber||'?'}</span>
-      <span class="state-badge ${sc}">${stLbl}</span>
+      <span class="pc-n">#${p.msg_number || '?'}</span>
+      <span class="state-badge s-${sl}">${stLbl}</span>
       <span class="delta-badge ${dc}">Δ ${d>=0?'+':''}${d.toFixed(2)}</span>
-      <span class="pc-xp">+${e.xpEarned||0} XP</span>
-      <span class="pc-time">${fmtTime(e.timestamp)}</span>
+      <span class="pc-xp">+${p.xp_earned || 0} XP</span>
+      <span class="pc-time">${fmtTime(p.created_at)}</span>
     </div>
     <div class="pc-body">
-      <div class="pc-prompt">${esc(e.prompt||'')}</div>
-      ${impacts}${analysis}${chips}
-    </div>${resp}`;
+      <div class="pc-prompt">${esc(p.prompt_text || '')}</div>
+      <div class="dim-impacts">${impacts}</div>
+      ${analysis}
+    </div>${respHtml}`;
   return card;
 }
 
-function buildImpacts(deltas){
-  const items=KEYS.map(k=>{
-    const v=deltas[k]??0;
-    const cls=v>0.05?'di-p':v<-0.05?'di-n':'di-z';
-    const arrow=v>0.05?'↑':v<-0.05?'↓':'→';
-    return `<span class="di ${cls}">${SHORT[k]} ${arrow}${Math.abs(v).toFixed(2)}</span>`;
+function buildAnalysis(f, s) {
+  const rows = [];
+  if (f.hasOwnThinking) rows.push(['a-good','✓','Shared own thinking — strong autonomy.']);
+  if (f.hasVerification) rows.push(['a-good','✓','Asked for verification — solid critical stance.']);
+  if (f.seeksUnderstanding) rows.push(['a-good','✓','Seeking understanding — deepens reflection.']);
+  if (f.isOutsourceOpener) rows.push(['a-warn','⚡','Outsourcing opener — share what you know first.']);
+  if (s.pasteRatio > 0.6) rows.push(['a-warn','⚡','High paste ratio — recycling AI text?']);
+  if (f.wordCount < 6) rows.push(['a-warn','⚡','Very short prompt — add context.']);
+  if (s.revisionCount >= 4) rows.push(['a-good','✓',`Revised ${s.revisionCount}× — iterative thinking.`]);
+  if (!rows.length) return '';
+  return `<div class="analysis">${rows.slice(0,3).map(([cls,icon,msg])=>`<div class="a-row"><span>${icon}</span><span class="a-text ${cls}">${esc(msg)}</span></div>`).join('')}</div>`;
+}
+
+function renderExercises() {
+  const el = $('ex-list');
+  const ex = studentState.exercises;
+  $('ex-n').textContent = ex.length;
+  if (!ex.length) { el.innerHTML = '<div style="font-family:var(--font-m);font-size:10px;color:var(--dim);text-align:center;padding:20px;">No exercises yet.</div>'; return; }
+  el.innerHTML = ex.slice(0, 15).map(x => `
+    <div style="background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:9px 11px;margin-bottom:6px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+        <span class="state-badge ${x.dim==='CE'?'s-thoughtless':x.dim==='CA'?'s-cautious':x.dim==='AR'?'s-reflective':'s-collaborative'}" style="font-size:8px;">${x.dim}</span>
+        <span style="font-size:11px;font-weight:600;">${esc(x.type || '')}</span>
+      </div>
+      <div style="font-size:10px;color:var(--muted);line-height:1.4;">${x.skipped?'<em>skipped</em>':esc((x.response||x.option||'').slice(0,120))}</div>
+    </div>`).join('');
+}
+
+function updateCharts() {
+  const logs = studentState.prompts;
+  trajChart.data.labels = logs.map((_, i) => '#'+(i+1));
+  KEYS.forEach((k, i) => {
+    trajChart.data.datasets[i].data = logs.map(p => p.profile_after ? p.profile_after[DIMS[i]] : null);
+  });
+  trajChart.update('none');
+  const last = logs.slice(-15);
+  sigChart.data.labels = last.map((_, i) => '#'+(logs.length - last.length + i + 1));
+  sigChart.data.datasets[0].data = last.map(p => Math.round(((p.signals||{}).pasteRatio || 0) * 100));
+  sigChart.data.datasets[1].data = last.map(p => (p.signals||{}).revisionCount || 0);
+  sigChart.data.datasets[2].data = last.map(p => Math.round(((p.features||{}).wordCount || 0) / 10));
+  sigChart.update('none');
+}
+
+function rerenderStudent(scrollTop) {
+  renderDims();
+  renderStats();
+  renderFeed(scrollTop);
+  renderExercises();
+  updateCharts();
+}
+
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTime(iso){ if(!iso) return ''; return new Date(iso).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+
+// =====================================================================
+// INSTRUCTOR VIEW
+// =====================================================================
+async function initInstructorView() {
+  if (!trajChart) initCharts();
+  await loadStudents();
+  subscribeInstructor();
+}
+
+async function loadStudents() {
+  const { data } = await client
+    .from('cr_profiles')
+    .select('*, profiles(email, display_name, participant_id, condition, phase)')
+    .order('updated_at', { ascending: false });
+  renderStudentList(data || []);
+}
+
+function renderStudentList(students) {
+  $('st-count').textContent = students.length;
+  $('student-rows').innerHTML = students.map(s => {
+    const p = s.profiles || {};
+    const name = p.display_name || p.email || s.user_id.slice(0, 8);
+    const dims = [s.critical_evaluation, s.cognitive_autonomy, s.adaptive_regulation, s.reflective_integration];
+    const avg = (dims.reduce((a,b)=>a+(+b||0),0)/4).toFixed(2);
+    return `<div class="student-row" data-uid="${s.user_id}">
+      <div class="student-name">${esc(name)}</div>
+      <div class="student-meta">${esc(p.condition || 'unspec')} · ${esc(p.phase || 'baseline')}</div>
+      <div class="student-stats">
+        <span class="student-stat">prompts <b>${s.prompt_count||0}</b></span>
+        <span class="student-stat">XP <b>${s.total_xp||0}</b></span>
+        <span class="student-stat">avg <b>${avg}</b></span>
+        <span class="student-stat">state <b>${s.current_state||'—'}</b></span>
+      </div>
+    </div>`;
   }).join('');
-  return `<div class="dim-impacts">${items}</div>`;
-}
-
-function buildAnalysis(e){
-  const f=e.features||{}, s=e.signals||{}, rows=[];
-  if(f.hasOwnThinking)   rows.push(['a-good','✓','You shared your own thinking first — strong autonomy.']);
-  if(f.hasVerification)  rows.push(['a-good','✓','You asked for sources or verification — solid critical stance.']);
-  if(f.seeksUnderstanding)rows.push(['a-good','✓','Seeking to understand why/how — deepens reflective thinking.']);
-  if(f.isOutsourceOpener)rows.push(['a-warn','⚡','Outsourcing opener — try sharing what you already know first.']);
-  if(f.isShortcut)       rows.push(['a-warn','⚡','Shortcut pattern — what understanding might you lose here?']);
-  if(f.wordCount<6)      rows.push(['a-warn','⚡','Very short prompt — add context for a more useful response.']);
-  if(s.pasteRatio>0.6)   rows.push(['a-warn','⚡','High paste ratio — are you recycling AI text without thinking?']);
-  if(s.copyEventsFromAI>0&&s.revisionCount<2) rows.push(['a-warn','⚡','Copied from AI without revising — try paraphrasing instead.']);
-  if(s.revisionCount>=4) rows.push(['a-good','✓',`Revised prompt ${s.revisionCount}× — iterative refinement is a strength.`]);
-  if(s.firstKeystrokeAfterAIMs!=null&&s.firstKeystrokeAfterAIMs<1500) rows.push(['a-warn','⚡','Next prompt very fast — did you read the response first?']);
-  if(s.deliberationMs&&s.deliberationMs>30000) rows.push(['a-good','✓','Long pause before asking — shows deliberate, self-paced thinking.']);
-  if(!rows.length)return '';
-  return `<div class="analysis"><div class="a-title">Prompt Analysis</div>${
-    rows.slice(0,3).map(([cls,icon,msg])=>`<div class="a-row"><span class="a-icon">${icon}</span><span class="a-text ${cls}">${esc(msg)}</span></div>`).join('')
-  }</div>`;
-}
-
-function buildChips(e){
-  const s=e.signals||{}, f=e.features||{}, chips=[];
-  chips.push(['sc-n',`${f.wordCount||0}w`]);
-  if(s.revisionCount) chips.push([s.revisionCount>=3?'sc-g':'sc-n',`${s.revisionCount} revs`]);
-  if(s.pasteRatio!=null) chips.push([s.pasteRatio>0.5?'sc-b':'sc-n',`paste ${Math.round(s.pasteRatio*100)}%`]);
-  if(s.deliberationMs) chips.push(['sc-n',`${(s.deliberationMs/1000).toFixed(0)}s gap`]);
-  if(s.copyEventsFromAI) chips.push(['sc-b','copied AI']);
-  if(f.hasVerification) chips.push(['sc-g','verified']);
-  if(f.hasOwnThinking)  chips.push(['sc-g','own thinking']);
-  if(!chips.length)return '';
-  return `<div class="sig-chips">${chips.map(([cls,t])=>`<span class="sc ${cls}">${t}</span>`).join('')}</div>`;
-}
-
-function buildResp(e){
-  const streaming=e.response&&!e.responseFinalAt;
-  const txt=esc((e.response||'').slice(0,300)+((e.response||'').length>300?'…':''));
-  const dotHtml=streaming?'<span class="stream-dot"></span>':'';
-  const lbl=streaming?`${dotHtml} AI RESPONSE — STREAMING`:'AI RESPONSE';
-  const done=e.responseFinalAt?'done':'';
-  return `<div class="resp-area">
-    <div class="resp-lbl">${lbl}</div>
-    <div class="resp-text ${done}" id="rt-${e.id}">${txt}</div>
-  </div>`;
-}
-
-function patchResponse(id,resp,final){
-  const el=document.getElementById('rt-'+id);if(!el)return;
-  el.textContent=(resp||'').slice(0,300)+((resp||'').length>300?'…':'');
-  if(final){
-    el.classList.add('done');
-    const lbl=el.closest('.resp-area')?.querySelector('.resp-lbl');
-    if(lbl)lbl.innerHTML='AI RESPONSE';
-  }
-}
-
-/* ---- Charts update ---- */
-function updateCharts(){
-  const logs=st.sessionLogs;
-  traj.data.labels=logs.map((_,i)=>'#'+(i+1));
-  KEYS.forEach((k,i)=>{traj.data.datasets[i].data=logs.map(e=>e.profileAfter?e.profileAfter[DIMS[i]]:null);});
-  traj.update('none');
-  const last=logs.slice(-15);
-  sigs.data.labels=last.map((_,i)=>'#'+(logs.length-last.length+i+1));
-  sigs.data.datasets[0].data=last.map(e=>Math.round((e.signals?.pasteRatio||0)*100));
-  sigs.data.datasets[1].data=last.map(e=>e.signals?.revisionCount||0);
-  sigs.data.datasets[2].data=last.map(e=>Math.round((e.features?.wordCount||0)/10));
-  sigs.update('none');
-}
-
-/* ---- Recommendation ---- */
-function renderRec(){
-  const rec=document.getElementById('rec');
-  if(st.sessionLogs.length<3){rec.classList.remove('vis');return;}
-  const sorted=DIMS.map((n,i)=>({n,k:KEYS[i],v:st.profile[n]??2})).sort((a,b)=>a.v-b.v);
-  const w=sorted[0];
-  if(w.v>=2.4){rec.classList.remove('vis');return;}
-  const msgs={
-    'Critical Evaluation':'Your weakest area is critically evaluating AI output. Before your next session, pick one AI claim and verify it independently.',
-    'Cognitive Autonomy':'You\'re relying heavily on the AI. Try writing 3 sentences of your own answer before asking each question.',
-    'Adaptive Regulation':'Prompts could be better calibrated. Include what you know, what you\'re unsure of, and what format you want.',
-    'Reflective Integration':'Connect AI answers to what you already know. After each response, summarize it without looking at it.'
-  };
-  const tips={CE:['Verify a claim','Ask for sources','Find an error'],CA:['Write first','Decline a suggestion','Try unaided'],AR:['Add context','30s pause','Vary depth'],RI:['Summarize aloud','Ask "why?"','Connect ideas']};
-  document.getElementById('rec-body').textContent=msgs[w.n]||'';
-  document.getElementById('rec-tips').innerHTML=(tips[w.k]||[]).map(t=>`<span class="rec-tip">${t}</span>`).join('');
-  rec.classList.add('vis');
-}
-
-/* ---- Exercises ---- */
-function renderEx(){
-  const el=document.getElementById('ex-list');
-  document.getElementById('ex-n').textContent=st.exerciseLogs.length;
-  if(!st.exerciseLogs.length){el.innerHTML='<div class="ex-empty">No exercises yet.</div>';return;}
-  el.innerHTML='';
-  st.exerciseLogs.slice().reverse().slice(0,15).forEach(x=>{
-    const div=document.createElement('div');div.className='ex-item';
-    const body=x.skipped?`<div class="ex-skip">skipped</div>`:`<div class="ex-resp">${esc((x.response||x.option||'').slice(0,120))}</div>`;
-    div.innerHTML=`<div class="ex-head"><span class="ex-tag ex-${x.dim}">${x.dim}</span><span class="ex-type">${esc(x.type||'')}</span></div>${body}`;
-    el.appendChild(div);
+  $('student-rows').querySelectorAll('.student-row').forEach(row => {
+    row.addEventListener('click', () => selectStudent(row.dataset.uid));
   });
 }
 
-/* ---- XP toast ---- */
-let toastT;
-function toast(xp){
-  const el=document.getElementById('xp-toast');
-  el.textContent='+'+xp+' XP';el.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2200);
+async function selectStudent(uid) {
+  activeStudentId = uid;
+  $('student-rows').querySelectorAll('.student-row').forEach(r => {
+    r.classList.toggle('active', r.dataset.uid === uid);
+  });
+  $('student-detail').className = '';
+  $('student-detail').innerHTML = `
+    <div class="stats-bar">
+      <div class="sb"><div class="sb-val" id="sv-p">0</div><div class="sb-lbl">Prompts</div></div>
+      <div class="sb"><div class="sb-val" id="sv-x">0</div><div class="sb-lbl">XP</div></div>
+      <div class="sb"><div class="sb-val" id="sv-a">2.00</div><div class="sb-lbl">Avg</div></div>
+      <div class="sb"><div class="sb-val" id="sv-s" style="font-size:13px;">—</div><div class="sb-lbl">State</div></div>
+    </div>
+    <div class="p-head"><span class="p-title">Live Prompt Feed</span><span class="p-badge" id="feed-n">0</span></div>
+    <div class="feed-area" id="feed"></div>`;
+  await loadStudentData(uid);
+  subscribeStudent(uid);
 }
 
-/* ---- Utils ---- */
-function fmtTime(iso){if(!iso)return'';return new Date(iso).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
-function esc(s){return(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function setConn(on){const b=document.getElementById('conn-badge'),t=document.getElementById('conn-txt');b.className='conn-badge '+(on?'live':'off');t.textContent=on?'Extension connected':'Waiting for extension…';}
-function setPart(p){const el=document.getElementById('p-chip');if(!p||!p.participantId){el.textContent='No participant';return;}el.textContent=`${p.participantId} · ${p.condition} · ${p.phase}`;}
-function rerender(deltas){renderDims(deltas);renderStats();renderFeed();renderEx();renderRec();updateCharts();}
-
-/* ---- PORTAL EVENT HANDLER ---- */
-window.ResilliAIPortal={
-  onEvent(m){
-    if(!m||!m.type)return;
-    if(m.participant)setPart(m.participant);
-    switch(m.type){
-      case 'bridge_ready': setConn(true);break;
-      case 'snapshot':{
-        setConn(true);const d=m.data||{};
-        st.profile=d.profile||d.scores||st.profile;
-        st.totalXP=d.totalXP||0;st.sessionLogs=d.sessionLogs||[];
-        st.exerciseLogs=d.exerciseLogs||[];st.surveyLogs=d.surveyLogs||[];
-        st.promptCount=st.sessionLogs.length;
-        st.liveEntries.clear();st.liveOrder=[];
-        for(const e of st.sessionLogs.slice(-30)){st.liveEntries.set(e.id,e);st.liveOrder.push(e.id);}
-        rerender();break;
-      }
-      case 'session_start': setConn(true);break;
-      case 'prompt':{
-        setConn(true);const e=m.payload?.entry;if(!e)return;
-        if(!st.liveEntries.has(e.id))st.liveOrder.push(e.id);
-        st.liveEntries.set(e.id,e);
-        if(m.payload.sessionStats?.profile)st.profile=m.payload.sessionStats.profile;
-        if(m.payload.sessionStats?.totalXP!=null)st.totalXP=m.payload.sessionStats.totalXP;
-        st.sessionLogs.push(e);if(st.sessionLogs.length>200)st.sessionLogs=st.sessionLogs.slice(-200);
-        st.promptCount++;toast(e.xpEarned||0);rerender(e.deltas);
-        setTimeout(()=>{const f=document.getElementById('feed');if(f)f.scrollTop=0;},50);
-        break;
-      }
-      case 'response_chunk':{
-        const id=m.payload?.entryId;if(!id)return;
-        const e=st.liveEntries.get(id);
-        if(e){e.response=m.payload.response;patchResponse(id,m.payload.response,false);}break;
-      }
-      case 'response_final':{
-        const id=m.payload?.entryId;if(!id)return;
-        const e=st.liveEntries.get(id);
-        if(e){e.response=m.payload.response;e.responseFinalAt=new Date().toISOString();e.responseDurationMs=m.payload.durationMs;patchResponse(id,m.payload.response,true);}break;
-      }
-      case 'exercise_completed':{
-        const log=m.payload?.log;if(log)st.exerciseLogs.push(log);
-        if(m.payload?.profile)st.profile=m.payload.profile;
-        renderDims();renderEx();renderRec();break;
-      }
-      case 'survey_completed':{
-        const log=m.payload?.log;if(log)st.surveyLogs.push(log);renderStats();break;
-      }
-    }
-  }
-};
-
-function requestSnapshot(){window.postMessage({target:'resiliai-extension',action:'request_snapshot'},'*');}
-window.requestSnapshot=requestSnapshot;
-
-function exportCSV(){
-  const rows=[['msgNumber','timestamp','site','prompt','response','wordCount','pasteRatio','revisionCount','copyAI','firstKeystrokeMs','deliberationMs','deltaCE','deltaCA','deltaAR','deltaRI','deltaSum','state','profileCE','profileCA','profileAR','profileRI']];
-  for(const e of st.sessionLogs){
-    const s=e.signals||{},f=e.features||{},d=e.deltas||{},p=e.profileAfter||{};
-    rows.push([e.msgNumber,e.timestamp,e.site,JSON.stringify(e.prompt||''),JSON.stringify(e.response||''),f.wordCount||'',(s.pasteRatio??''),s.revisionCount||0,s.copyEventsFromAI||0,s.firstKeystrokeAfterAIMs??'',s.deliberationMs??'',d.CE??'',d.CA??'',d.AR??'',d.RI??'',e.deltaSummary??'',e.state||'',p['Critical Evaluation']??'',p['Cognitive Autonomy']??'',p['Adaptive Regulation']??'',p['Reflective Integration']??'']);
-  }
-  const csv=rows.map(r=>r.map(v=>{const s=String(v??'');return(s.includes(',')||s.includes('"'))?`"${s.replace(/"/g,'""')}"`':s;}).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=`resiliai_${st.participant?.participantId||'anon'}_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+function subscribeInstructor() {
+  client.channel('inst-all-profiles')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'cr_profiles' }, () => loadStudents())
+    .subscribe();
 }
-window.exportCSV=exportCSV;
 
-rerender();
+// =====================================================================
+// EXPORT
+// =====================================================================
+$('export-btn').addEventListener('click', async () => {
+  if (!user) return;
+  const targetId = (role === 'instructor' && activeStudentId) ? activeStudentId : user.id;
+  const { data } = await client.from('prompts').select('*').eq('user_id', targetId).order('created_at', { ascending: true });
+  const rows = [['msg_number','timestamp','site','prompt','response','word_count','delta_summary','state','xp_earned']];
+  (data || []).forEach(p => rows.push([
+    p.msg_number, p.created_at, p.site,
+    JSON.stringify(p.prompt_text||''), JSON.stringify(p.response_text||''),
+    p.word_count||'', p.delta_summary||'', p.state||'', p.xp_earned||''
+  ]));
+  const csv = rows.map(r => r.map(v => {
+    const s = String(v ?? '');
+    return (s.includes(',') || s.includes('"')) ? `"${s.replace(/"/g,'""')}"` : s;
+  }).join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `resiliai_${targetId.slice(0,8)}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+});
+
+// Boot
+bootstrap();
 </script>
 </body>
 </html>
